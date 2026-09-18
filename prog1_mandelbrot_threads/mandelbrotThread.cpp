@@ -30,15 +30,37 @@ extern void mandelbrotSerial(
 // Thread entrypoint.
 void workerThreadStart(WorkerArgs * const args) {
 
-    // TODO FOR CS149 STUDENTS: Implement the body of the worker
-    // thread here. Each thread should make a call to mandelbrotSerial()
-    // to compute a part of the output image.  For example, in a
-    // program that uses two threads, thread 0 could compute the top
-    // half of the image and thread 1 could compute the bottom half.
+    // Block decomposition: thread i computes a single contiguous band
+    // of rows. When height does not divide evenly by numThreads, the
+    // first (height % numThreads) threads take one extra row each so
+    // that every row is covered exactly once.
+    int rowsPerThread = args->height / args->numThreads;
+    int remainder     = args->height % args->numThreads;
 
-    printf("Hello world from thread %d\n", args->threadId);
+    int startRow, numRows;
+    if (args->threadId < remainder) {
+        numRows  = rowsPerThread + 1;
+        startRow = args->threadId * numRows;
+    } else {
+        numRows  = rowsPerThread;
+        startRow = remainder * (rowsPerThread + 1)
+                 + (args->threadId - remainder) * rowsPerThread;
+    }
+
+    double startTime = CycleTimer::currentSeconds();
+
+    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
+                     args->width, args->height,
+                     startRow, numRows,
+                     args->maxIterations, args->output);
+
+    double endTime = CycleTimer::currentSeconds();
+
+    printf("[thread %d of %d] rows %d..%d (%d rows): %.3f ms\n",
+           args->threadId, args->numThreads,
+           startRow, startRow + numRows - 1, numRows,
+           (endTime - startTime) * 1000);
 }
-
 //
 // MandelbrotThread --
 //
