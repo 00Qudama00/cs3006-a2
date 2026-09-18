@@ -30,35 +30,28 @@ extern void mandelbrotSerial(
 // Thread entrypoint.
 void workerThreadStart(WorkerArgs * const args) {
 
-    // Block decomposition: thread i computes a single contiguous band
-    // of rows. When height does not divide evenly by numThreads, the
-    // first (height % numThreads) threads take one extra row each so
-    // that every row is covered exactly once.
-    int rowsPerThread = args->height / args->numThreads;
-    int remainder     = args->height % args->numThreads;
-
-    int startRow, numRows;
-    if (args->threadId < remainder) {
-        numRows  = rowsPerThread + 1;
-        startRow = args->threadId * numRows;
-    } else {
-        numRows  = rowsPerThread;
-        startRow = remainder * (rowsPerThread + 1)
-                 + (args->threadId - remainder) * rowsPerThread;
-    }
-
+    // Row-cyclic (interleaved) decomposition: thread i computes rows
+    // i, i+numThreads, i+2*numThreads, ... Adjacent rows cost almost
+    // the same, so striding by numThreads gives every thread a near
+    // identical mix of cheap and expensive rows. This removes the
+    // imbalance the block decomposition suffered from.
     double startTime = CycleTimer::currentSeconds();
 
-    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
-                     args->width, args->height,
-                     startRow, numRows,
-                     args->maxIterations, args->output);
+    int rowsDone = 0;
+    for (unsigned int row = args->threadId; row < args->height;
+         row += args->numThreads) {
+        mandelbrotSerial(args->x0, args->y0, args->x1, args->y1,
+                         args->width, args->height,
+                         row, 1,
+                         args->maxIterations, args->output);
+        rowsDone++;
+    }
 
     double endTime = CycleTimer::currentSeconds();
 
-    printf("[thread %d of %d] rows %d..%d (%d rows): %.3f ms\n",
+    printf("[thread %d of %d] %d rows (cyclic, stride %d): %.3f ms\n",
            args->threadId, args->numThreads,
-           startRow, startRow + numRows - 1, numRows,
+           rowsDone, args->numThreads,
            (endTime - startTime) * 1000);
 }
 //
