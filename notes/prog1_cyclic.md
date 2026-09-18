@@ -23,3 +23,17 @@ COMPARISON (block -> cyclic):
   (b) residual imbalance: spread widens to 1.21 at stride 8
   (c) VMware guest cannot see SMT topology; all-core turbo on a 15W
       U-series chip is well below single-core turbo used by the serial run
+
+## Part 5: 2T threads (2 x 8 = 16)
+16 threads: 5.15x  (vs 5.18x at 8 threads) - no improvement
+  per-thread: 75 rows each, ~34-87 ms, spread ratio ~2.5
+  8 threads:  150 rows each, ~70-86 ms, spread ratio 1.21
+
+Conclusion: hardware already saturated at T=8. Adding software threads
+adds no execution resources, only queueing. Each thread does half the
+work at roughly half speed -> same wall clock.
+Wider spread at 16t is SCHEDULING JITTER, not load imbalance: every
+thread has exactly 75 rows of comparable cost. Threads descheduled
+mid-row record longer wall times for identical work.
+No slowdown because Mandelbrot has a tiny working set and long-running
+rows, so context switches are rare and caches stay warm.
