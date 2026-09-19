@@ -1,4 +1,4 @@
-#define NUM_TASKS 64
+#define NUM_TASKS 16
 
 
 static inline int mandel(float c_re, float c_im, int count) {
