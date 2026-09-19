@@ -65,27 +65,49 @@ double dist(double *x, double *y, int nDim) {
  * Assigns each data point to its "closest" cluster centroid.
  */
 void computeAssignments(WorkerArgs *const args) {
-  double *minDist = new double[args->M];
-  
-  // Initialize arrays
-  for (int m =0; m < args->M; m++) {
-    minDist[m] = 1e30;
-    args->clusterAssignments[m] = -1;
-  }
-
-  // Assign datapoints to closest centroids
-  for (int k = args->start; k < args->end; k++) {
-    for (int m = 0; m < args->M; m++) {
+  // Each thread handles data points [start, end). For every point it
+  // checks all K centroids and keeps the nearest one. Points do not
+  // depend on each other, so no locking is needed.
+  for (int m = args->start; m < args->end; m++) {
+    double best = 1e30;
+    int bestK = -1;
+    for (int k = 0; k < args->K; k++) {
       double d = dist(&args->data[m * args->N],
                       &args->clusterCentroids[k * args->N], args->N);
-      if (d < minDist[m]) {
-        minDist[m] = d;
-        args->clusterAssignments[m] = k;
+      if (d < best) {
+        best = d;
+        bestK = k;
       }
     }
+    args->clusterAssignments[m] = bestK;
+  }
+}
+
+// Number of worker threads used for computeAssignments.
+#define NUM_THREADS 8
+
+static void assignmentsParallel(WorkerArgs *const base) {
+  std::thread workers[NUM_THREADS];
+  WorkerArgs targs[NUM_THREADS];
+
+  int M = base->M;
+  int chunk = M / NUM_THREADS;
+  int rem = M % NUM_THREADS;
+  int pos = 0;
+
+  for (int t = 0; t < NUM_THREADS; t++) {
+    targs[t] = *base;
+    int size = chunk + (t < rem ? 1 : 0);
+    targs[t].start = pos;
+    targs[t].end = pos + size;
+    pos += size;
   }
 
-  delete[] minDist;
+  for (int t = 1; t < NUM_THREADS; t++)
+    workers[t] = std::thread(computeAssignments, &targs[t]);
+  computeAssignments(&targs[0]);
+  for (int t = 1; t < NUM_THREADS; t++)
+    workers[t].join();
 }
 
 /**
@@ -211,7 +233,7 @@ void kMeansThread(double *data, double *clusterCentroids, int *clusterAssignment
     args.end = K;
 
     double t0 = CycleTimer::currentSeconds();
-    computeAssignments(&args);
+    assignmentsParallel(&args);
     double t1 = CycleTimer::currentSeconds();
     computeCentroids(&args);
     double t2 = CycleTimer::currentSeconds();
