@@ -33,8 +33,22 @@ int main() {
         // array here to meet the instructions in the handout: we want
         // to you generate best and worse-case speedups
         
-        // starter code populates array with random input values
+        // CS149 students: input selection for best/worst case speedup.
+        // Set MODE below: 0 = random (starter), 1 = max speedup, 2 = min speedup
+#define MODE 2
+#if MODE == 0
         values[i] = .001f + 2.998f * static_cast<float>(rand()) / RAND_MAX;
+#elif MODE == 1
+        // MAX SPEEDUP: every element is the slowest-converging value, so all
+        // lanes in a vector need the same large iteration count. No lane is
+        // ever masked off waiting for another, so SIMD is fully utilised.
+        values[i] = 2.998f;
+#else
+        // MIN SPEEDUP: one expensive element per vector, the rest converge
+        // after one iteration. The whole vector must keep looping for that
+        // single lane, so 7 of 8 lanes are wasted work.
+        values[i] = (i % 8 == 0) ? 2.998f : 1.0f;
+#endif
     }
 
     // generate a gold version to check results
