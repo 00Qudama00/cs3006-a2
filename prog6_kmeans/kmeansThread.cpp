@@ -189,6 +189,9 @@ void kMeansThread(double *data, double *clusterCentroids, int *clusterAssignment
   args.N = N;
   args.K = K;
 
+  // Profiling accumulators
+  double tAssign = 0.0, tCentroid = 0.0, tCost = 0.0;
+
   // Initialize arrays to track cost
   for (int k = 0; k < K; k++) {
     prevCost[k] = 1e30;
@@ -207,12 +210,30 @@ void kMeansThread(double *data, double *clusterCentroids, int *clusterAssignment
     args.start = 0;
     args.end = K;
 
+    double t0 = CycleTimer::currentSeconds();
     computeAssignments(&args);
+    double t1 = CycleTimer::currentSeconds();
     computeCentroids(&args);
+    double t2 = CycleTimer::currentSeconds();
     computeCost(&args);
+    double t3 = CycleTimer::currentSeconds();
+
+    tAssign += (t1 - t0);
+    tCentroid += (t2 - t1);
+    tCost += (t3 - t2);
 
     iter++;
   }
+
+  double tTotal = tAssign + tCentroid + tCost;
+  printf("\n--- PROFILE over %d iterations ---\n", iter);
+  printf("computeAssignments: %9.3f ms  (%.4f of total)\n",
+         tAssign * 1000, tAssign / tTotal);
+  printf("computeCentroids  : %9.3f ms  (%.4f of total)\n",
+         tCentroid * 1000, tCentroid / tTotal);
+  printf("computeCost       : %9.3f ms  (%.4f of total)\n",
+         tCost * 1000, tCost / tTotal);
+  printf("sum of the three  : %9.3f ms\n", tTotal * 1000);
 
   delete[] currCost;
   delete[] prevCost;
