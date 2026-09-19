@@ -1,3 +1,4 @@
+#define NUM_TASKS 64
 
 
 static inline int mandel(float c_re, float c_im, int count) {
@@ -68,10 +69,10 @@ export void mandelbrot_ispc_withtasks(uniform float x0, uniform float y0,
                                       uniform int output[])
 {
 
-    uniform int rowsPerTask = height / 2;
+    uniform int rowsPerTask = height / NUM_TASKS;
 
     // create 2 tasks
-    launch[2] mandelbrot_ispc_task(x0, y0, x1, y1,
+    launch[NUM_TASKS] mandelbrot_ispc_task(x0, y0, x1, y1,
                                      width, height,
                                      rowsPerTask,
                                      maxIterations,
