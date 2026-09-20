@@ -1,0 +1,111 @@
+11e9f30 Final submission: write-up, plots, cleaned tree
+ writeup.md  | 169 +++++++++++++++++++++++++++++++++---------------------------
+ writeup.pdf | Bin 0 -> 163206 bytes
+ 2 files changed, 92 insertions(+), 77 deletions(-)
+d211960 Add write-up skeleton with all measured results and tables
+ writeup.md | 319 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 319 insertions(+)
+cfadb7f Prog3: record corrected task sweep, 30.09x = 94 percent of the 32x ceiling
+ notes/prog2345.md | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+f5d2f83 Record Program 2-5 results and analysis
+ notes/prog2345.md | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+0662bf4 Prog3: set task count to 16 after a repeated sweep over divisors of 1200
+ prog3_mandelbrot_ispc/mandelbrot.ispc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+9ae48f7 Prog6: record profile, Amdahl ceiling and achieved speedup
+ notes/prog6.md | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+b67f127 Keep plots only in plots/, ignore the copies inside prog6_kmeans
+ .gitignore             |   2 ++
+ prog6_kmeans/end.png   | Bin 183718 -> 0 bytes
+ prog6_kmeans/start.png | Bin 328447 -> 0 bytes
+ 3 files changed, 2 insertions(+)
+bd0c7c8 Prog6: add start and end cluster plots
+ plots/end.png          | Bin 0 -> 183718 bytes
+ plots/start.png        | Bin 0 -> 328447 bytes
+ prog6_kmeans/end.png   | Bin 0 -> 183718 bytes
+ prog6_kmeans/start.png | Bin 0 -> 328447 bytes
+ 4 files changed, 0 insertions(+), 0 deletions(-)
+22848a9 Prog6: parallelise computeAssignments across data points using 8 threads
+ prog6_kmeans/kmeansThread.cpp | 54 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 38 insertions(+), 16 deletions(-)
+f246837 Prog6: add CycleTimer profiling to find the hotspot
+ prog6_kmeans/kmeansThread.cpp | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+b74ec41 Prog4: construct max-speedup and min-speedup inputs for the sqrt kernel
+ prog4_sqrt/main.cpp | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+eeec961 Prog3 part 2: parameterise task count and sweep 1-64 tasks
+ prog3_mandelbrot_ispc/mandelbrot.ispc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+35cc98c Prog2: vectorised clampedExp and arraySum using CS149 intrinsics
+ prog2_vecintrin/main.cpp | 77 ++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 62 insertions(+), 15 deletions(-)
+9d909a5 Prog1 part 5: 16 threads gives 5.15x vs 5.18x at 8 - hardware already saturated
+ notes/prog1_cyclic.md | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+56bd63f Prog1: record cyclic timings and imbalance analysis
+ notes/prog1_cyclic.md | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+0200c86 Prog1 parts 3-4: row-cyclic decomposition removes load imbalance (4 threads 2.17x -> 3.24x)
+ prog1_mandelbrot_threads/mandelbrotThread.cpp | 39 +++++++++++----------------
+ 1 file changed, 16 insertions(+), 23 deletions(-)
+f474582 Prog1: record block-decomposition timings showing load imbalance
+ notes/prog1_block.md | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+624ee1b Prog1 part 1: block row decomposition with per-thread timing instrumentation
+ prog1_mandelbrot_threads/mandelbrotThread.cpp | 36 +++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 7 deletions(-)
+137462a Record machine specification and dataset checksum for write-up
+ notes/machine.txt | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+4e2e71a Verify build of all six programs; data.dat generated, md5 matches 3a25f241
+ prog6_kmeans/generate_data.py | 149 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 149 insertions(+)
+4d79b76 Add missing <cstring> and <cstdlib> includes for GCC 13+ (Section 4)
+ prog1_mandelbrot_threads/main.cpp             | 1 +
+ prog1_mandelbrot_threads/mandelbrotThread.cpp | 1 +
+ 2 files changed, 2 insertions(+)
+9ba3f47 Add gitignore for build output and dataset
+ .gitignore | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+4d428d4 Initial commit: unmodified CS149 starter code
+ README.md                                     |  435 +++++++++
+ README_aarch64.md                             |  408 ++++++++
+ common/CycleTimer.h                           |   27 +
+ common/ppm.cpp                                |   35 +
+ common/tasksys.cpp                            | 1246 +++++++++++++++++++++++++
+ handout-images/kmeans.jpg                     |  Bin 0 -> 574329 bytes
+ handout-images/mandelbrot_viz.jpg             |  Bin 0 -> 64877 bytes
+ handout-images/sqrt_graph.jpg                 |  Bin 0 -> 59297 bytes
+ prog1_mandelbrot_threads/Makefile             |   35 +
+ prog1_mandelbrot_threads/main.cpp             |  174 ++++
+ prog1_mandelbrot_threads/mandelbrotSerial.cpp |   92 ++
+ prog1_mandelbrot_threads/mandelbrotThread.cpp |   96 ++
+ prog2_vecintrin/CS149intrin.cpp               |  261 ++++++
+ prog2_vecintrin/CS149intrin.h                 |  126 +++
+ prog2_vecintrin/Makefile                      |   13 +
+ prog2_vecintrin/logger.cpp                    |   46 +
+ prog2_vecintrin/logger.h                      |   35 +
+ prog2_vecintrin/main.cpp                      |  280 ++++++
+ prog3_mandelbrot_ispc/Makefile                |   44 +
+ prog3_mandelbrot_ispc/main.cpp                |  211 +++++
+ prog3_mandelbrot_ispc/mandelbrot.ispc         |   79 ++
+ prog3_mandelbrot_ispc/mandelbrotSerial.cpp    |   92 ++
+ prog4_sqrt/Makefile                           |   44 +
+ prog4_sqrt/main.cpp                           |  103 ++
+ prog4_sqrt/sqrt.ispc                          |   62 ++
+ prog4_sqrt/sqrtSerial.cpp                     |   29 +
+ prog5_saxpy/Makefile                          |   40 +
+ prog5_saxpy/main.cpp                          |  120 +++
+ prog5_saxpy/saxpy.ispc                        |   39 +
+ prog5_saxpy/saxpySerial.cpp                   |   13 +
+ prog6_kmeans/Makefile                         |   37 +
+ prog6_kmeans/kmeansThread.cpp                 |  219 +++++
+ prog6_kmeans/main.cpp                         |  150 +++
+ prog6_kmeans/plot.py                          |   54 ++
+ prog6_kmeans/requirements.txt                 |    3 +
+ prog6_kmeans/utils.cpp                        |   88 ++
+ 36 files changed, 4736 insertions(+)
